@@ -1,5 +1,6 @@
 -- CatchDeal Supabase 스키마 (명세서 4절 기준)
 -- Supabase SQL Editor에서 실행
+-- 실행 순서: 01 → 02 → ... (번호 순)
 
 -- subscription_users (구독/라이선스)
 CREATE TABLE IF NOT EXISTS subscription_users (

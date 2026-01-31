@@ -1,9 +1,10 @@
 import { ipcMain } from 'electron'
 import Store from 'electron-store'
 import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from 'crypto'
-import type { AppConfig, FilterConfig, SectorConfig } from '@catchdeal/shared'
-import { DEFAULT_MIN_PRICE, DEFAULT_DISCOUNT_RATE } from '@catchdeal/shared'
+import type { AppConfig, FilterConfig, SectorConfig, CafeSourceConfig } from '@catchdeal/shared'
 
+const DEFAULT_MIN_PRICE = 100_000
+const DEFAULT_DISCOUNT_RATE = 50
 const KEY_LEN = 32
 const IV_LEN = 16
 const SALT = 'catch-deal-payment-v1'
@@ -40,6 +41,7 @@ const defaultFilter: FilterConfig = {
 function getDefaultConfig(): AppConfig {
   return {
     sectors: [] as SectorConfig[],
+    cafeSources: [] as CafeSourceConfig[],
     filter: { ...defaultFilter },
     paymentPasswordEncrypted: null,
   }
@@ -47,14 +49,21 @@ function getDefaultConfig(): AppConfig {
 
 export function getConfig(): AppConfig {
   const saved = store.get('config')
-  if (!saved) return getDefaultConfig()
-  return { ...getDefaultConfig(), ...saved, filter: { ...defaultFilter, ...saved.filter } }
+  const defaults = getDefaultConfig()
+  if (!saved) return defaults
+  return {
+    ...defaults,
+    ...saved,
+    cafeSources: saved.cafeSources ?? defaults.cafeSources,
+    filter: { ...defaultFilter, ...saved.filter },
+  }
 }
 
 export function setConfig(config: Partial<AppConfig>) {
   const current = getConfig()
   const next: AppConfig = {
     sectors: config.sectors ?? current.sectors,
+    cafeSources: config.cafeSources ?? current.cafeSources,
     filter: { ...current.filter, ...config.filter },
     paymentPasswordEncrypted: config.paymentPasswordEncrypted ?? current.paymentPasswordEncrypted,
   }
@@ -81,7 +90,10 @@ export function getPaymentPasswordDecrypted(): string | null {
   }
 }
 
+const CONFIG_CHANNELS = ['config:get', 'config:set', 'config:setPaymentPassword'] as const
+
 export function registerConfigHandlers() {
+  CONFIG_CHANNELS.forEach((ch) => ipcMain.removeHandler(ch))
   ipcMain.handle('config:get', () => getConfig())
   ipcMain.handle('config:set', (_e, config: Partial<AppConfig>) => setConfig(config))
   ipcMain.handle('config:setPaymentPassword', (_e, password: string) => setPaymentPassword(password))

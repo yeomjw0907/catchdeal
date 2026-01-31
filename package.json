@@ -9,6 +9,7 @@
     "dev:admin": "npm run dev -w admin-web",
     "dev:mall": "npm run dev -w mall-web",
     "build:client": "npm run build -w client-exe",
+    "build:client:win": "npm run build:win -w client-exe",
     "build:admin": "npm run build -w admin-web",
     "build:mall": "npm run build -w mall-web",
     "build": "npm run build -w shared && npm run build -w client-exe && npm run build -w admin-web && npm run build -w mall-web"

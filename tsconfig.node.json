@@ -6,8 +6,8 @@
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "outDir": "dist-electron",
-    "rootDir": "src-main"
+    "outDir": "apps/client-exe/dist-electron",
+    "rootDir": "apps/client-exe/src-main"
   },
-  "include": ["src-main/**/*"]
+  "include": ["apps/client-exe/src-main/**/*"]
 }

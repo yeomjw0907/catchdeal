@@ -1,16 +1,20 @@
 import { createClient, SupabaseClient, Session } from '@supabase/supabase-js'
 import type { SubscriptionUser, TradeLog, TradeLogInsert } from '@catchdeal/shared'
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || ''
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || ''
-
 let client: SupabaseClient | null = null
 let currentSession: Session | null = null
 
+function getEnv() {
+  const url = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || ''
+  const key = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || ''
+  return { url, key }
+}
+
 export function getSupabase(): SupabaseClient {
   if (!client) {
-    if (!supabaseUrl || !supabaseAnonKey) throw new Error('Supabase URL/Key not configured')
-    client = createClient(supabaseUrl, supabaseAnonKey, {
+    const { url, key } = getEnv()
+    if (!url || !key) throw new Error('Supabase URL/Key not configured')
+    client = createClient(url, key, {
       auth: { persistSession: true, storage: undefined },
     })
   }

@@ -7,16 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     electron([
-      {
-        entry: 'src-main/main.ts',
-        vite: {
-          build: {
-            rollupOptions: {
-              external: ['playwright', 'playwright-core', /^chromium-bidi/],
-            },
-          },
-        },
-      },
+      { entry: 'src-main/main.ts' },
       { entry: 'src-main/preload.ts', onstart(options) { options.reload() } }
     ])
   ],

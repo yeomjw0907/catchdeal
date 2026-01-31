@@ -28,7 +28,9 @@ catchdeal/
 │   └── shared/         # 공통 타입·상수 (@catchdeal/shared)
 ├── package.json       # 루트 워크스페이스
 ├── .env.example       # 환경 변수 예시
-├── supabase-schema.sql # Supabase 테이블 DDL
+├── sql_setup/           # SQL 스크립트 (번호 순 실행)
+│   ├── 01_supabase_schema.sql
+│   └── README.md
 └── README.md
 ```
 
@@ -161,7 +163,7 @@ npm run dev:mall
 
 ## 7. 데이터베이스 (Supabase)
 
-Supabase 대시보드 **SQL Editor**에서 루트의 `supabase-schema.sql`을 실행해 테이블을 생성합니다.
+Supabase 대시보드 **SQL Editor**에서 `sql_setup/01_supabase_schema.sql`을 실행해 테이블을 생성합니다. 이후 스크립트는 번호 순(02, 03, …)으로 추가·실행하면 됩니다.
 
 - **subscription_users** — 구독/라이선스, HWID, 만료일
 - **trade_logs** — 구매 로그 (상품명, 구매가, 판매예정가, 상태 등)

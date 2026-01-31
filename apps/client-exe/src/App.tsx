@@ -15,13 +15,20 @@ declare global {
       stopEngine: () => Promise<{ ok: boolean }>
       getEngineStatus: () => Promise<string>
       getDailyStats: () => Promise<{ scanCount: number; purchaseCount: number; date: string }>
+      getExtractedLinks: () => Promise<import('@catchdeal/shared').ExtractedLinkItem[]>
+      onExtractedLinks: (cb: (item: import('@catchdeal/shared').ExtractedLinkItem) => void) => void
+      onExtractedLinkUpdated: (cb: (item: import('@catchdeal/shared').ExtractedLinkItem) => void) => void
       onLog: (cb: (line: string) => void) => void
       onStatusChange: (cb: (status: string) => void) => void
       getTradeLogs: (limit?: number) => Promise<unknown[]>
       openOrderPage: (url: string) => void
       openSalePage: (url: string) => void
+      launchChromeWithDebug: () => Promise<{ ok: boolean; error?: string }>
+      getAppStartTime: () => Promise<number>
+      fetchCafeLinks: (cafeListUrl: string, keyword: string) => Promise<{ ok: boolean; links: { title: string; url: string }[]; error?: string }>
       getHwid: () => Promise<string>
-      openCoupangLogin: () => Promise<void>
+      getCoupangCookiesSummary: () => Promise<{ count: number; names: string[] }>
+      setCoupangCookies: (json: string) => Promise<{ ok: boolean; error?: string }>
     }
   }
 }

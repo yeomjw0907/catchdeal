@@ -1,11 +1,14 @@
-import { ipcMain, BrowserWindow } from 'electron'
+import { ipcMain } from 'electron'
 import { getSupabase, getSubscriptionUser, setSession, getSession, resetSupabaseClient } from './supabase'
 import { getHWID } from './hwid'
 import Store from 'electron-store'
 
 const store = new Store<{ coupangCookies?: string; session?: { access_token: string; refresh_token: string } }>({ name: 'catch-deal-auth' })
 
+const AUTH_CHANNELS = ['auth:login', 'auth:logout', 'auth:getSession', 'auth:getHwid', 'auth:getCoupangCookiesSummary', 'auth:setCoupangCookies'] as const
+
 export function registerAuthHandlers() {
+  AUTH_CHANNELS.forEach((ch) => ipcMain.removeHandler(ch))
   ipcMain.handle('auth:login', async (_e, email: string, password: string) => {
     const supabase = getSupabase()
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
@@ -61,29 +64,23 @@ export function registerAuthHandlers() {
 
   ipcMain.handle('auth:getHwid', () => getHWID())
 
-  ipcMain.handle('auth:openCoupangLogin', async () => {
-    const win = BrowserWindow.getFocusedWindow() || BrowserWindow.getAllWindows()[0]
-    const authWin = new BrowserWindow({
-      width: 900,
-      height: 700,
-      parent: win ?? undefined,
-      modal: !!win,
-      webPreferences: { nodeIntegration: false },
-    })
-    authWin.loadURL('https://login.coupang.com/login/login.pang')
-    return new Promise<void>((resolve) => {
-      authWin.webContents.session.webRequest.onCompleted(
-        { urls: ['https://*.coupang.com/*'] },
-        async () => {
-          const cookies = await authWin.webContents.session.cookies.get({ domain: '.coupang.com' })
-          const serialized = JSON.stringify(cookies.map((c) => ({ name: c.name, value: c.value, domain: c.domain })))
-          store.set('coupangCookies', serialized)
-          authWin.close()
-          resolve()
-        }
-      )
-      authWin.on('closed', () => resolve())
-    })
+  /** 저장된 쿠팡 쿠키 목록 (이름만, UI 표시용) */
+  ipcMain.handle('auth:getCoupangCookiesSummary', () => {
+    const cookies = getCoupangCookies()
+    return { count: cookies.length, names: cookies.map((c) => c.name) }
+  })
+
+  /** 쿠키 수동 적용 (Chrome 등에서 로그인 후 내보낸 쿠키 JSON 붙여넣기용) */
+  ipcMain.handle('auth:setCoupangCookies', (_e, json: string) => {
+    try {
+      const arr = JSON.parse(json) as Array<{ name: string; value: string; domain?: string }>
+      if (!Array.isArray(arr) || arr.some((x) => !x?.name || x?.value == null)) return { ok: false, error: '형식 오류' }
+      const serialized = JSON.stringify(arr.map((c) => ({ name: c.name, value: c.value, domain: c.domain || '.coupang.com' })))
+      store.set('coupangCookies', serialized)
+      return { ok: true }
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : 'JSON 파싱 실패' }
+    }
   })
 }
 
