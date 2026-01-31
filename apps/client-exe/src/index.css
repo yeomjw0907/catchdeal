@@ -1,0 +1,31 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+  background: #0f1419;
+  color: #e7e9ea;
+  min-height: 100vh;
+}
+#root {
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+input, select, textarea {
+  font-family: inherit;
+}
+
+:root {
+  --accent: #1d9bf0;
+  --accent-hover: #1a8cd8;
+  --bg-card: #16181c;
+  --border: #2f3336;
+  --text-muted: #71767b;
+  --success: #00ba7c;
+  --danger: #f4212e;
+}

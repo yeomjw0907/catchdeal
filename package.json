@@ -1,0 +1,23 @@
+{
+  "name": "catchdeal-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CatchDeal monorepo — client-exe, admin-web, mall-web",
+  "scripts": {
+    "build:shared": "npm run build -w @catchdeal/shared",
+    "dev:client": "npm run build -w @catchdeal/shared && npm run dev -w client-exe",
+    "dev:admin": "npm run dev -w admin-web",
+    "dev:mall": "npm run dev -w mall-web",
+    "build:client": "npm run build -w client-exe",
+    "build:admin": "npm run build -w admin-web",
+    "build:mall": "npm run build -w mall-web",
+    "build": "npm run build -w shared && npm run build -w client-exe && npm run build -w admin-web && npm run build -w mall-web"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
